@@ -35,17 +35,18 @@ services:
 
   frontend:
     build:
-      context: ./Perishable_Food_Inventory_React_Frontend_v2
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: food_waste_frontend
     ports:
-      - "5173:5173"
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
     environment:
-      VITE_API_BASE_URL: http://localhost:8000
+      BACKEND_URL: http://backend:8000
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
     depends_on:
       - backend
-    restart: unless-stopped
-
 
   mqtt:
     image: eclipse-mosquitto:2.1.2-alpine
@@ -59,7 +60,6 @@ services:
   kafka:
     image: apache/kafka:4.3.1
     container_name: food_waste_kafka
-    user: "0:0"
     ports:
       - "9092:9092"
     environment:

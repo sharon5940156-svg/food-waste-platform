@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemetry-consumer
+  template:
+    metadata:
+      labels:
+        app: telemetry-consumer
+    spec:
+      containers:
+        - name: telemetry-consumer
+          image: food-waste-platform-telemetry-consumer:latest
+          imagePullPolicy: Never
+          env:
+            - name: KAFKA_BOOTSTRAP
+              value: "kafka:19092"
+            - name: KAFKA_TOPIC
+              value: "telemetry.raw"
+            - name: KAFKA_GROUP
+              value: "telemetry-backend"
+            - name: BACKEND_URL
+              value: "http://backend:8000"

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensor-simulator
+  template:
+    metadata:
+      labels:
+        app: sensor-simulator
+    spec:
+      containers:
+        - name: sensor-simulator
+          image: food-waste-platform-sensor-simulator:latest
+          imagePullPolicy: Never
+          env:
+            - name: MQTT_HOST
+              value: "mqtt"
+            - name: MQTT_PORT
+              value: "1883"
+            - name: MQTT_TOPIC_BASE
+              value: "food/telemetry"
+            - name: INTERVAL_SECONDS
+              value: "10"

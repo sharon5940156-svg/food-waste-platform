@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edge-gateway
+  template:
+    metadata:
+      labels:
+        app: edge-gateway
+    spec:
+      containers:
+        - name: edge-gateway
+          image: food-waste-platform-edge-gateway:latest
+          imagePullPolicy: Never
+          env:
+            - name: MQTT_HOST
+              value: "mqtt"
+            - name: MQTT_PORT
+              value: "1883"
+            - name: MQTT_TOPIC
+              value: "food/telemetry/#"
+            - name: KAFKA_BOOTSTRAP
+              value: "kafka:19092"
+            - name: KAFKA_TOPIC
+              value: "telemetry.raw"

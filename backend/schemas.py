@@ -41,6 +41,38 @@ class TelemetryReading(BaseModel):
     spoilage_risk_score: Optional[float]
 
 
+class SalesCreate(BaseModel):
+    product_id: int
+    date: date
+    units_sold: float = Field(ge=0)
+
+
+class SalesResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    product_id: int
+    date: date
+    units_sold: float
+
+
+class DemandEvaluation(BaseModel):
+    mae: float
+    wmape: float
+    forecast_bias: float
+    pinball_loss_q10: float
+    pinball_loss_q50: float
+    pinball_loss_q90: float
+    asymmetric_loss: float
+    test_period_days: int
+
+class BurnoutPoint(BaseModel):
+    day: int
+    predicted_demand: float
+    dynamic_spoilage: float
+    remaining_stock: float
+
+
 class ForecastResponse(BaseModel):
     batch_id: int
     product_id: int
@@ -51,3 +83,12 @@ class ForecastResponse(BaseModel):
     forecast_method: str
     sample_count: int
     current_status: str
+
+    demand_forecast_7d: list[float] = Field(default_factory=list)
+    model_evaluation: Optional[DemandEvaluation] = None
+    burnout_timeline: list[BurnoutPoint] = Field(default_factory=list)
+    predicted_waste_units: float = 0
+    production_recommendation: float = 0
+    lead_time_days: int = 2
+    dynamic_rop: float = 0
+   
