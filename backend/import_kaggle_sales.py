@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +13,7 @@ from models import DailyDemand, Product
 CSV_FILE = "train.csv"
 
 DATABASE_URL = (
-    "postgresql://postgres:postgres@timescaledb:5432/food_waste_db"
+    os.getenv("DATABASE_URL", "postgresql://postgres:postgres@timescaledb:5432/food_waste_db")
 )
 
 # Import one real store to keep the dataset manageable.
