@@ -329,22 +329,68 @@ function TelemetryChart({ rows, detailed = false }: { rows: TelemetryReading[]; 
 }
 
 function ForecastChart({ forecast, detailed = false }: { forecast: Forecast | null; detailed?: boolean }) {
-  const data = forecast?.burnout_timeline ?? [];
-  return <section className={`card chart ${detailed ? "detailed" : ""}`}><Head title="7-Day Demand & Burnout" sub="Demand forecast and remaining stock from the forecasting engine"/>
-    {data.length ? <ResponsiveContainer width="100%" height={detailed ? 330 : 260}><BarChart data={data}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="day" tickFormatter={v => `D${v}`}/><YAxis/><Tooltip/><Legend/><ReferenceLine y={0}/>
-<Bar
-  dataKey="predicted_demand"
-  name="Predicted Demand"
-  fill="#2563eb"
-/>
-<Bar
-  dataKey="dynamic_spoilage"
-  name="Dynamic Spoilage"
-  fill="#dc2626"
-/>
-</BarChart></ResponsiveContainer> : <div className="empty">No forecast loaded for the selected batch.</div>}
-    {detailed && forecast && <div className="forecastMeta"><span>Method <b>{forecast.forecast_method}</b></span><span>Samples <b>{forecast.sample_count}</b></span><span>Lead time <b>{forecast.lead_time_days} days</b></span><span>Dynamic ROP <b>{forecast.dynamic_rop}</b></span></div>}
-  </section>;
+  const timeline = forecast?.burnout_timeline ?? [];
+  const demand = forecast?.demand_forecast_7d ?? [];
+
+  const data = demand.map((value, i) => ({
+    day: i + 1,
+    predicted_demand: value,
+    dynamic_spoilage: timeline[i]?.dynamic_spoilage ?? 0,
+  }));
+
+  return (
+    <section className={`card chart ${detailed ? "detailed" : ""}`}>
+      <Head
+        title="7-Day Demand & Burnout"
+        sub="Demand forecast and remaining stock from the forecasting engine"
+      />
+
+      {data.length ? (
+        <ResponsiveContainer width="100%" height={detailed ? 330 : 260}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="day" tickFormatter={v => `D${v}`} />
+
+            <YAxis yAxisId="demand" />
+
+            <YAxis
+              yAxisId="spoilage"
+              orientation="right"
+            />
+
+            <Tooltip />
+            <Legend />
+            <ReferenceLine y={0} yAxisId="demand" />
+
+            <Bar
+              dataKey="predicted_demand"
+              name="Predicted Demand"
+              fill="#2563eb"
+              yAxisId="demand"
+            />
+
+            <Bar
+              dataKey="dynamic_spoilage"
+              name="Dynamic Spoilage"
+              fill="#dc2626"
+              yAxisId="spoilage"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="empty">No forecast loaded for the selected batch.</div>
+      )}
+
+      {detailed && forecast && (
+        <div className="forecastMeta">
+          <span>Method <b>{forecast.forecast_method}</b></span>
+          <span>Samples <b>{forecast.sample_count}</b></span>
+          <span>Lead time <b>{forecast.lead_time_days} days</b></span>
+          <span>Dynamic ROP <b>{forecast.dynamic_rop}</b></span>
+        </div>
+      )}
+    </section>
+  );
 }
 
 function ModelEvaluation({ evaluation }: any) {
